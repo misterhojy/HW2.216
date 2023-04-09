@@ -67,18 +67,25 @@ public class RadialGraph extends Shape {
         if (this.neighbors == null || neighbors.isEmpty()) {
             return "[" + this.center + "]";
         } else {
-            //checking if the center is (0,0), if not translate it so that it is.
-            if (!(this.center.equals(new Point(this.center.name, 0, 0)))) {
-                RadialGraph centeredRadial = translateBy(-(this.center.x), -(this.center.y));
-            }
-            Collections.sort(centeredRadial.neighbors,  {
-                double p1AngleInRadians = Math.atan2(p1.y, p1.x);
-                double p2AngleInRadians = Math.atan2(p2.y, p2.x);
-                return Double.compare(p1AngleInRadians, p2AngleInRadians);
+            //center is (0,0), if not translate it so that it is.
+            this.neighbors = translateBy(-(this.center.x), -(this.center.y)).neighbors;
+            this.neighbors.sort((p1, p2) -> {
+                double p1AngleRadian = Math.atan2(p1.y, p1.x);
+                double p2AngleRadian = Math.atan2(p2.y, p2.x);
+                // Normalize angle values to the range [0, 2π]
+                if (p1AngleRadian < 0) {
+                    p1AngleRadian += 2 * Math.PI;
+                } if (p2AngleRadian < 0) {
+                    p2AngleRadian += 2 * Math.PI;
+                }
+                // Compare the normalized angle values
+                return Double.compare(p1AngleRadian, p2AngleRadian);
             });
+            //after comparing translate it back to original
+            this.neighbors = translateBy(this.center.x, this.center.y).neighbors;
 
             StringJoiner sj = new StringJoiner("; ", "[", "]");
-            sj.add(center.toString());
+            sj.add(this.center.toString());
             for(Point p : this.neighbors) {
                 sj.add(p.toString());
             }
@@ -95,18 +102,18 @@ public class RadialGraph extends Shape {
      * in mind that the lines already provided here as expected to work exactly as they are (some lines have additional
      * explanation of what is expected) */
     public static void main(String... args) {
-        Point center = new Point("center", 1, 0);
-        Point east = new Point("east", 2, 0);
-        Point west = new Point("west", 0, 0);
-        Point north = new Point("north", 1, 1);
-        Point south = new Point("south", 1, -1);
+        Point center = new Point("center", 0, 0);
+        Point east = new Point("east", 1, 0);
+        Point west = new Point("west", -1, 0);
+        Point north = new Point("north", 0, 1);
+        Point south = new Point("south", 0, -1);
         Point toofarsouth = new Point("south", 0, -2);
 
         // A single node is a valid radial graph.
         RadialGraph lonely = new RadialGraph(center);
 
         // Must print: [(center, 0.0, 0.0)]
-//        System.out.println(lonely);
+        System.out.println(lonely);
 
 
         // This line must throw IllegalArgumentException, since the edges will not be of the same length
@@ -120,7 +127,10 @@ public class RadialGraph extends Shape {
 
         // After this counterclockwise rotation by 90 degrees, "north" must be at (-1, 0), and similarly for all the
         // other radial points. The center, however, must remain exactly where it was.
-//        g = g.rotateBy(90);
+        g = g.rotateBy(90);
+
+        // [(center, 0.0, 0.0); (south, 1.0, 0.0); (east, 0.0, 1.0); (north, -1.0, 0.0); (west, 0.0, -1.0)]
+        System.out.println(g);
 
         // you should similarly add tests for the translateBy(x, y) method
     }
