@@ -9,19 +9,21 @@ public class RadialGraph extends Shape {
     /* constructor with neighbors, check if the edges are the same length away from center */
     public RadialGraph(Point center, List<Point> neighbors) {
         try {
+            //got first distance, every other distance must match this
             double dist = Math.sqrt(Math.pow(neighbors.get(0).x - center.x, 2) + Math.pow(neighbors.get(0).y - center.y, 2));
+            //getting distance of everyone
             for (Point p : neighbors) {
                 double currentDist = Math.sqrt(Math.pow(p.x - center.x, 2) + Math.pow(p.y - center.y, 2));
+                //if it doesn't match error
                 if (dist != currentDist) {
                     throw new IllegalStateException("Edges are not the same length for creating a RadialGraph");
                 }
             }
             this.center = center;
             this.neighbors = neighbors;
-            sortRadial();
         } catch (IllegalStateException exception){
-                System.out.println("Caught Exception: " + exception.getMessage());
-                System.exit(-1);
+            System.out.println("Caught Exception: " + exception.getMessage());
+            System.exit(-1);
         }
     }
 
@@ -30,86 +32,88 @@ public class RadialGraph extends Shape {
         this.center = center;
     }
 
-    /* create the new rotatedGraph to be return, keep same center, use formula to rotate each point keep same name and
-    * add to the new Graph */
+    /* create the new rotatedGraph to be return,same center, use formula to rotate each point keep same name, add to the new Graph */
     @Override
     public RadialGraph rotateBy(int degrees) {
-        //convert to rads
-        double theta = degrees * (Math.PI/180);
+        //degrees into rads
+        double radians = Math.toRadians(degrees);
         //translate to (0,0) if not already (0,0)
-        this.neighbors = translateBy(-(this.center.x), -(this.center.y)).neighbors;
-        //the new graph to be rotated
-        RadialGraph rotatedGraph = new RadialGraph(this.center);
+        //new Radial graph to be made
+        ArrayList<Point> rotatedPoints = new ArrayList<>();
+        RadialGraph rotatedGraph = translateBy(-(center.x), -(center.y));
         //each point to be rotated and added to new graph
-        for (Point p : this.neighbors) {
-            double cosTheta = Math.cos(theta);
-            double sinTheta = Math.sin(theta);
-            double rotatedX = p.x * cosTheta - p.x * sinTheta;
-            double rotatedY = p.y * sinTheta + p.y * cosTheta;
-            rotatedGraph.neighbors.add(new Point(p.name, rotatedX, rotatedY));
+        for (Point p : rotatedGraph.neighbors) {
+            double rotatedX = p.x * Math.cos(radians) - p.y * Math.sin(radians);
+            double rotatedY = p.x * Math.sin(radians) + p.y * Math.cos(radians);
+            rotatedPoints.add(new Point(p.name, rotatedX, rotatedY));
         }
-        //translate back to original spot
-        this.neighbors = translateBy((this.center.x), (this.center.y)).neighbors;
-        rotatedGraph.neighbors = translateBy((this.center.x), (this.center.y)).neighbors;
+        rotatedGraph.neighbors = rotatedPoints;
+        //translate back to origin
+        rotatedGraph = rotatedGraph.translateBy((center.x), (center.y));
         //update the neighbors
-        this.neighbors = rotatedGraph.neighbors;
         return rotatedGraph;
     }
 
     /* move center first and create the new translatedGraph to be returned, then also translate all the points keeping
-    * the same name for each point */
+     * the same name for each point */
     @Override
     public RadialGraph translateBy(double xAmount, double yAmount) {
         //translate the center
-        double xTranslated = this.center.x + xAmount;
-        double yTranslated = this.center.y + yAmount;
-        Point newCenter = new Point(this.center.name, xTranslated,yTranslated);
-        //update old center
-        this.center = newCenter;
-        //create new translatedGraph with the new center
-        RadialGraph translatedGraph = new RadialGraph(newCenter);
-        //each point needs to be translated and added to the new RadialGraph
-        for (Point p : this.neighbors) {
-            double px = p.x + xAmount;
-            double py = p.y + yAmount;
-            translatedGraph.neighbors.add(new Point(p.name, px, py));
+        double xTranslatedCenter = center.x + xAmount;
+        double yTranslatedCenter = center.y + yAmount;
+        Point translatedCenter = new Point(center.name, xTranslatedCenter,yTranslatedCenter);
+        //creating translatedGraph with the new center
+        RadialGraph translatedGraph = new RadialGraph(translatedCenter);
+        translatedGraph.neighbors = new ArrayList<>();
+        for (Point p : neighbors) {
+            double xTran = p.x + xAmount;
+            double yTran = p.y + yAmount;
+            translatedGraph.neighbors.add(new Point(p.name, xTran, yTran));
         }
-        //update the neighbors
-        this.neighbors = translatedGraph.neighbors;
         return translatedGraph;
     }
 
-    private void sortRadial() {
-        //center is (0,0), if not translate it so that it is.
-        this.neighbors = translateBy(-(this.center.x), -(this.center.y)).neighbors;
-        //sorting the points in angle order respect to x-axis
-        this.neighbors.sort((p1, p2) -> {
+    private RadialGraph sortAngle() {
+        //if it is not at (0,0) already we bring it there
+        RadialGraph rotatedGraph = translateBy(-(center.x), -(center.y));
+        //sorting counterclockwise in respect to x-axis
+        rotatedGraph.neighbors.sort((p1, p2) -> {
             double p1AngleRadian = Math.atan2(p1.y, p1.x);
             double p2AngleRadian = Math.atan2(p2.y, p2.x);
+            p1AngleRadian = round(p1AngleRadian, 3);
+            p2AngleRadian = round(p2AngleRadian, 3);
             // Normalize angle values to the range [0, 2π]
             if (p1AngleRadian < 0) {
                 p1AngleRadian += 2 * Math.PI;
-            } if (p2AngleRadian < 0) {
+            }
+            if (p2AngleRadian < 0) {
                 p2AngleRadian += 2 * Math.PI;
             }
+
             // Compare the normalized angle values
             return Double.compare(p1AngleRadian, p2AngleRadian);
         });
         //after comparing translate it back to original
-        this.neighbors = translateBy((this.center.x), (this.center.y)).neighbors;
+        rotatedGraph = rotatedGraph.translateBy(center.x, center.y);
+        return rotatedGraph;
+    }
+
+    private static double round (double value, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return (double) Math.round(value * scale) / scale;
     }
 
     @Override
     public String toString() {
         //checking if it is only a center then only return the center if not then do the rest
         if (neighbors == null || neighbors.isEmpty()) {
-            return "[(" + center.name + ", " + String.format("%.2f", center.x) + ", " + String.format("%.2f", center.y) + ")]";
+            return "[" + this.center + "]";
         } else {
-            sortRadial();
+            RadialGraph sortedGraph = this.sortAngle();
             StringBuilder sb = new StringBuilder();
-            sb.append("[(").append(center.name).append(", ").append(String.format("%.2f", center.x)).append(", ").append(String.format("%.2f", center.y)).append(")");
-            for (Point p : neighbors) {
-                sb.append("; (").append(p.name).append(", ").append(String.format("%.2f", p.x)).append(", ").append(String.format("%.2f", p.y)).append(")");
+            sb.append("[(").append(sortedGraph.center.name).append(", ").append(round(center.x, 1)).append(", ").append(round(center.y, 1)).append(")");
+            for (Point p : sortedGraph.neighbors) {
+                sb.append("; (").append(p.name).append(", ").append(round(p.x, 1)).append(", ").append(round(p.y,1)).append(")");
             }
             sb.append("]");
             return sb.toString();
@@ -130,31 +134,42 @@ public class RadialGraph extends Shape {
         Point west = new Point("west", -1, 0);
         Point north = new Point("north", 0, 1);
         Point south = new Point("south", 0, -1);
-        Point toofarsouth = new Point("south", 0, -2);
+//        Point toofarsouth = new Point("south", 0, -2);
 
-        // A single node is a valid radial graph.
-        RadialGraph lonely = new RadialGraph(center);
-
+//        RadialGraph lonely = new RadialGraph(center);
         // Must print: [(center, 0.0, 0.0)]
-        System.out.println(lonely);
+//        System.out.println(lonely);
 
 
         // This line must throw IllegalArgumentException, since the edges will not be of the same length
 //        RadialGraph nope = new RadialGraph(center, Arrays.asList(north, toofarsouth, east, west));
 
         Shape g = new RadialGraph(center, Arrays.asList(north, south, east, west));
-
-        // Must follow the documentation in the Shape abstract class, and print the following string:
         // [(center, 0.0, 0.0); (east, 1.0, 0.0); (north, 0.0, 1.0); (west, -1.0, 0.0); (south, 0.0, -1.0)]
-//        System.out.println(g);
-
-        // After this counterclockwise rotation by 90 degrees, "north" must be at (-1, 0), and similarly for all the
-        // other radial points. The center, however, must remain exactly where it was.
-        g = g.rotateBy(90);
-
-        // [(center, 0.0, 0.0); (south, 1.0, 0.0); (east, 0.0, 1.0); (north, -1.0, 0.0); (west, 0.0, -1.0)]
+        System.out.println("Original: ");
         System.out.println(g);
 
-        // you should similarly add tests for the translateBy(x, y) method
+        // [(center, 1.0, 0.0); (east, 2.0, 0.0); (north, 1.0, 1.0); (west, 0.0, 0.0); (south, 1.0, -1.0)]
+        g = g.translateBy(1,0);
+        System.out.println("Translated(1, 0): ");
+        System.out.println(g);
+
+
+//         [(center, 0.0, 0.0); (south, 2.0, 0.0); (east, 1.0, 1.0); (north, 0.0, 0.0); (west, 1.0, -1.0)]
+        System.out.println("Rotated(90): ");
+        g = g.rotateBy(90);
+        System.out.println(g);
+
+
+        // [(center, 1.5, .5); (south, 2.5, 0.5); (east, 1.5, 1.5); (north, 0.5, 0.5); (west, 1.5, -0.5)]
+        System.out.println("Translated(.5, .5): ");
+        g = g.translateBy(.5,.5);
+        System.out.println(g);
+
+        // [(center, 1.5, .5); (east, 2.5, 0.5); (north, 1.5, 1.5); (west, 0.5, 0.5); (south, 1.5, -0.5)]
+        System.out.println("Rotated(270): ");
+        g = g.rotateBy(270);
+        System.out.println(g);
+
     }
 }
