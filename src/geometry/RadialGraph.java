@@ -75,9 +75,9 @@ public class RadialGraph extends Shape {
 
     private RadialGraph sortAngle() {
         //if it is not at (0,0) already we bring it there
-        RadialGraph rotatedGraph = translateBy(-(center.x), -(center.y));
+        RadialGraph sortedGraph = translateBy(-(center.x), -(center.y));
         //sorting counterclockwise in respect to x-axis
-        rotatedGraph.neighbors.sort((p1, p2) -> {
+        sortedGraph.neighbors.sort((p1, p2) -> {
             double p1AngleRadian = Math.atan2(p1.y, p1.x);
             double p2AngleRadian = Math.atan2(p2.y, p2.x);
             p1AngleRadian = round(p1AngleRadian, 3);
@@ -89,13 +89,25 @@ public class RadialGraph extends Shape {
             if (p2AngleRadian < 0) {
                 p2AngleRadian += 2 * Math.PI;
             }
-
             // Compare the normalized angle values
-            return Double.compare(p1AngleRadian, p2AngleRadian);
+            int angleComparison = Double.compare(p1AngleRadian, p2AngleRadian);
+            // If angles are the same, compare by distance from center
+            if (angleComparison == 0) {
+                double p1DistanceFromCenter = dist(p1, center());
+                double p2DistanceFromCenter = dist(p2,center());
+                // Compare by distance from center
+                return Double.compare(p1DistanceFromCenter, p2DistanceFromCenter);
+            } else {
+                return angleComparison;
+            }
         });
         //after comparing translate it back to original
-        rotatedGraph = rotatedGraph.translateBy(center.x, center.y);
-        return rotatedGraph;
+        sortedGraph = sortedGraph.translateBy(center.x, center.y);
+        return sortedGraph;
+    }
+
+    private double dist(Point a, Point b) {
+        return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2);
     }
 
     private static double round (double value, int precision) {
