@@ -4,6 +4,15 @@ import java.util.*;
 
 public class RadialGraph extends Shape {
     private Point center;
+
+    public Point getCenter() {
+        return center;
+    }
+
+    public List<Point> getNeighbors() {
+        return neighbors;
+    }
+
     private List<Point> neighbors;
 
     /* constructor with neighbors, check if the edges are the same length away from center */
@@ -116,6 +125,34 @@ public class RadialGraph extends Shape {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        if (!(o instanceof RadialGraph)) {
+            return false;
+        }
+
+        RadialGraph other = (RadialGraph) o;
+        if ((this.center.x == other.center.x) && (this.center.y == other.center.y)){
+            if (this.neighbors.size() == other.neighbors.size()) {
+                for (int i = 0; i < this.neighbors.size(); i++) {
+                    if (round(this.neighbors.get(i).x,4) == round(other.neighbors.get(i).x,4) && round(this.neighbors.get(i).y,4) == round(other.neighbors.get(i).y,4)) {
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
         //checking if it is only a center then only return the center if not then do the rest
         if (neighbors == null || neighbors.isEmpty()) {
@@ -140,48 +177,48 @@ public class RadialGraph extends Shape {
     /* Driver method given to you as an outline for testing your code. You can modify this as you want, but please keep
      * in mind that the lines already provided here as expected to work exactly as they are (some lines have additional
      * explanation of what is expected) */
-    public static void main(String... args) {
-        Point center = new Point("center", 0, 0);
-        Point east = new Point("east", 1, 0);
-        Point west = new Point("west", -1, 0);
-        Point north = new Point("north", 0, 1);
-        Point south = new Point("south", 0, -1);
-//        Point toofarsouth = new Point("south", 0, -2);
-
-//        RadialGraph lonely = new RadialGraph(center);
-        // Must print: [(center, 0.0, 0.0)]
-//        System.out.println(lonely);
-
-
-        // This line must throw IllegalArgumentException, since the edges will not be of the same length
-//        RadialGraph nope = new RadialGraph(center, Arrays.asList(north, toofarsouth, east, west));
-
-        Shape g = new RadialGraph(center, Arrays.asList(north, south, east, west));
-        // [(center, 0.0, 0.0); (east, 1.0, 0.0); (north, 0.0, 1.0); (west, -1.0, 0.0); (south, 0.0, -1.0)]
-        System.out.println("Original: ");
-        System.out.println(g);
-
-        // [(center, 1.0, 0.0); (east, 2.0, 0.0); (north, 1.0, 1.0); (west, 0.0, 0.0); (south, 1.0, -1.0)]
-        g = g.translateBy(1,0);
-        System.out.println("Translated(1, 0): ");
-        System.out.println(g);
-
-
-//         [(center, 0.0, 0.0); (south, 2.0, 0.0); (east, 1.0, 1.0); (north, 0.0, 0.0); (west, 1.0, -1.0)]
-        System.out.println("Rotated(90): ");
-        g = g.rotateBy(90);
-        System.out.println(g);
-
-
-        // [(center, 1.5, .5); (south, 2.5, 0.5); (east, 1.5, 1.5); (north, 0.5, 0.5); (west, 1.5, -0.5)]
-        System.out.println("Translated(.5, .5): ");
-        g = g.translateBy(.5,.5);
-        System.out.println(g);
-
-        // [(center, 1.5, .5); (east, 2.5, 0.5); (north, 1.5, 1.5); (west, 0.5, 0.5); (south, 1.5, -0.5)]
-        System.out.println("Rotated(270): ");
-        g = g.rotateBy(270);
-        System.out.println(g);
-
-    }
+//    public static void main(String... args) {
+//        Point center = new Point("center", 0, 0);
+//        Point east = new Point("east", 1, 0);
+//        Point west = new Point("west", -1, 0);
+//        Point north = new Point("north", 0, 1);
+//        Point south = new Point("south", 0, -1);
+////        Point toofarsouth = new Point("south", 0, -2);
+//
+////        RadialGraph lonely = new RadialGraph(center);
+//        // Must print: [(center, 0.0, 0.0)]
+////        System.out.println(lonely);
+//
+//
+//        // This line must throw IllegalArgumentException, since the edges will not be of the same length
+////        RadialGraph nope = new RadialGraph(center, Arrays.asList(north, toofarsouth, east, west));
+//
+//        Shape g = new RadialGraph(center, Arrays.asList(north, south, east, west));
+//        // [(center, 0.0, 0.0); (east, 1.0, 0.0); (north, 0.0, 1.0); (west, -1.0, 0.0); (south, 0.0, -1.0)]
+//        System.out.println("Original: ");
+//        System.out.println(g);
+//
+//        // [(center, 1.0, 0.0); (east, 2.0, 0.0); (north, 1.0, 1.0); (west, 0.0, 0.0); (south, 1.0, -1.0)]
+//        g = g.translateBy(1,0);
+//        System.out.println("Translated(1, 0): ");
+//        System.out.println(g);
+//
+//
+////         [(center, 0.0, 0.0); (south, 2.0, 0.0); (east, 1.0, 1.0); (north, 0.0, 0.0); (west, 1.0, -1.0)]
+//        System.out.println("Rotated(90): ");
+//        g = g.rotateBy(90);
+//        System.out.println(g);
+//
+//
+//        // [(center, 1.5, .5); (south, 2.5, 0.5); (east, 1.5, 1.5); (north, 0.5, 0.5); (west, 1.5, -0.5)]
+//        System.out.println("Translated(.5, .5): ");
+//        g = g.translateBy(.5,.5);
+//        System.out.println(g);
+//
+//        // [(center, 1.5, .5); (east, 2.5, 0.5); (north, 1.5, 1.5); (west, 0.5, 0.5); (south, 1.5, -0.5)]
+//        System.out.println("Rotated(270): ");
+//        g = g.rotateBy(270);
+//        System.out.println(g);
+//
+//    }
 }

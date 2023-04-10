@@ -1,7 +1,8 @@
 package geometry;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+
 
 /**
  * This class is given to you as an outline for testing your code. You can modify this as you want, but please keep in
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class GeometryTest {
 
-    /* public static void main(String... args) {
+     public static void main(String... args) {
         testRadialGraphSymmetries();
         testSquareSymmetries();
     }
@@ -29,6 +30,10 @@ public class GeometryTest {
         RadialGraph g4 = g1.rotateBy(180);
 
         RadialGraphSymmetries graphSymmetries = new RadialGraphSymmetries();
+        System.out.println(graphSymmetries.areSymmetric(g1,g2));
+        System.out.println(graphSymmetries.areSymmetric(g1,g3));
+        System.out.println(graphSymmetries.areSymmetric(g3,g4));
+
         graphSymmetries.areSymmetric(g1, g2); // must return false
         graphSymmetries.areSymmetric(g1, g3); // must return true
         graphSymmetries.areSymmetric(g3, g4); // must return true
@@ -36,7 +41,7 @@ public class GeometryTest {
         // obtain all the symmetries (including the identity) of g1, and print them one by one (remember that printing
         // will give the string representation of each radial graph, which must follow the specification of Shape's
         // toString() method)
-        List<RadialGraph> symmetries = graphSymmetries.symmetriesOf(g1);
+        Collection<RadialGraph> symmetries = graphSymmetries.symmetriesOf(g1);
         for (RadialGraph g : symmetries) System.out.println(g);
     }
 
@@ -47,15 +52,17 @@ public class GeometryTest {
         Square sq3 = sq1.rotateBy(180);
 
         SquareSymmetries squareSymmetries = new SquareSymmetries();
+        System.out.println(squareSymmetries.areSymmetric(sq1, sq2));
+        System.out.println(squareSymmetries.areSymmetric(sq1, sq3));
         squareSymmetries.areSymmetric(sq1, sq2); // must return false
         squareSymmetries.areSymmetric(sq1, sq3); // must return true
 
         // obtain all the 8 symmetries (including the identity) of sq1, and print them one by one (remember that printing
         // will give the string representation of each square, which must follow the specification of Shape's toString()
         // method)
-        List<Square> symmetries = squareSymmetries.symmetriesOf(sq1);
+        Collection<Square> symmetries = squareSymmetries.symmetriesOf(sq1);
         for (Square s : symmetries) System.out.println(s);
 
 
-    } */
+    }
 }
