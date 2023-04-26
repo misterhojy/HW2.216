@@ -25,14 +25,13 @@ public class RadialGraph extends Shape {
                 double currentDist = Math.sqrt(Math.pow(p.x - center.x, 2) + Math.pow(p.y - center.y, 2));
                 //if it doesn't match error
                 if (dist != currentDist) {
-                    throw new IllegalStateException("Edges are not the same length for creating a RadialGraph");
+                    throw new IllegalArgumentException("Edges are not the same length for creating a RadialGraph");
                 }
             }
             this.center = center;
             this.neighbors = neighbors;
-        } catch (IllegalStateException exception){
-            System.out.println("Caught Exception: " + exception.getMessage());
-            System.exit(-1);
+        } catch (IllegalArgumentException ignored){
+
         }
     }
 
@@ -160,9 +159,9 @@ public class RadialGraph extends Shape {
         } else {
             RadialGraph sortedGraph = this.sortAngle();
             StringBuilder sb = new StringBuilder();
-            sb.append("[(").append(sortedGraph.center.name).append(", ").append(round(center.x, 1)).append(", ").append(round(center.y, 1)).append(")");
+            sb.append("[(").append(sortedGraph.center.name).append(", ").append(round(center.x, 2)).append(", ").append(round(center.y, 2)).append(")");
             for (Point p : sortedGraph.neighbors) {
-                sb.append("; (").append(p.name).append(", ").append(round(p.x, 1)).append(", ").append(round(p.y,1)).append(")");
+                sb.append("; (").append(p.name).append(", ").append(round(p.x, 2)).append(", ").append(round(p.y,2)).append(")");
             }
             sb.append("]");
             return sb.toString();

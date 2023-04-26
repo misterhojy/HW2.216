@@ -34,7 +34,7 @@ public class Square extends Shape {
         try {
             //if it not a valid square throw error
            if (!isValidSquare(a, b, c, d)) {
-               throw new IllegalStateException("The square is not valid");
+               throw new IllegalArgumentException("The square is not valid");
            }
            //creating a list for all points in order
             this.points = new ArrayList<>(Arrays.asList(a, b, c, d));
@@ -42,9 +42,8 @@ public class Square extends Shape {
             this.b = b;
             this.c = c;
             this.d = d;
-        } catch (IllegalStateException exception){
-            System.out.println("Caught Exception: " + exception.getMessage());
-            System.exit(2);
+        } catch (IllegalArgumentException ignored){
+
         }
     }
 
@@ -66,6 +65,7 @@ public class Square extends Shape {
                 return false;
             }
         }
+        
         //check diagonals
         double d2 = round(dist(a, c), 4); // from a to c
         double d3 = round(dist(b, d), 4); // from b to d
@@ -263,7 +263,7 @@ public class Square extends Shape {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (Point p : sortedSquare.points) {
-            sb.append("(").append(p.name).append(", ").append(round(p.x, 1)).append(", ").append(round(p.y,1)).append("); ");
+            sb.append("(").append(p.name).append(", ").append(round(p.x, 2)).append(", ").append(round(p.y,2)).append("); ");
         }
         sb.delete(sb.length()-2, sb.length());
         sb.append("]");
